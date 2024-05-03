@@ -46,8 +46,29 @@ php bin/console doctrine:migrations:migrate
 ```
 ## Utilisation
 
+### en local
+
 ```bash
 symfony server:start
 ```
 
 Vous pourrez ensuite vous connecter à [votre API](127.0.0.1:8000)
+
+### avec docker
+
+Initialiser la base de donnée
+
+```
+make init
+```
+
+Pour faire les migrations
+
+```
+make migrate
+```
+Pensez à faire les migrations régulièrement pour gardez votre base de donnée à jour.
+
+Pour vous connecter depuis les images docker:
+- [votre site](localhost:8080)
+- [PhpMyAdmin](localhost:8899)
