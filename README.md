@@ -32,6 +32,10 @@ cp .env .env.local
 ```
 
 Modifiez la ligne DATABASE de .env.local pour mettre les valeurs de votre base de donnée
+> Attention: si vous utilisez docker, pensez à bien mettre les bonnes variables pour la base de donnée. par défaut, elle devrait ressembler à ça:
+> ```
+> DATABASE_URL="mysql://symfony:symfony@database:3306/symfony"
+> ```
 
 Génerez votre APP_SECRET
 ```bash
@@ -68,6 +72,16 @@ Pour faire les migrations
 make migrate
 ```
 Pensez à faire les migrations régulièrement pour gardez votre base de donnée à jour.
+
+Pour démarrer le projet:
+```
+make up
+```
+
+Pour l'éteindre:
+```
+make down
+```
 
 Pour vous connecter depuis les images docker:
 - [votre site](http://localhost:8080)
