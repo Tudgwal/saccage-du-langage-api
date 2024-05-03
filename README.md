@@ -52,7 +52,7 @@ php bin/console doctrine:migrations:migrate
 symfony server:start
 ```
 
-Vous pourrez ensuite vous connecter à [votre API](127.0.0.1:8000)
+Vous pourrez ensuite vous connecter à [votre API](http://127.0.0.1:8000)
 
 ### avec docker
 
@@ -70,5 +70,5 @@ make migrate
 Pensez à faire les migrations régulièrement pour gardez votre base de donnée à jour.
 
 Pour vous connecter depuis les images docker:
-- [votre site](localhost:8080)
-- [PhpMyAdmin](localhost:8899)
+- [votre site](http://localhost:8080)
+- [PhpMyAdmin](http://localhost:8899)
