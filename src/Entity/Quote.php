@@ -30,15 +30,15 @@ class Quote
 
     #[ORM\ManyToOne(inversedBy: 'quotes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?politician $politician = null;
+    private ?Politician $politician = null;
 
     #[ORM\ManyToOne(inversedBy: 'quotes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?party $party = null;
+    private ?Party $party = null;
 
     #[ORM\ManyToOne(inversedBy: 'quotes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?user $user = null;
+    private ?User $user = null;
 
     /**
      * @var Collection<int, Vote>
@@ -104,38 +104,38 @@ class Quote
         return $this;
     }
 
-    public function getPolitician(): ?politician
+    public function getPolitician(): ?Politician
     {
-        return $this->politician;
+        return $this->Politician;
     }
 
-    public function setPolitician(?politician $politician): static
+    public function setPolitician(?Politician $politician): static
     {
-        $this->politician = $politician;
+        $this->Politician = $politician;
 
         return $this;
     }
 
-    public function getParty(): ?party
+    public function getParty(): ?Party
     {
-        return $this->party;
+        return $this->Party;
     }
 
-    public function setParty(?party $party): static
+    public function setParty(?Party $party): static
     {
-        $this->party = $party;
+        $this->Party = $party;
 
         return $this;
     }
 
-    public function getUser(): ?user
+    public function getUser(): ?User
     {
-        return $this->user;
+        return $this->User;
     }
 
-    public function setUser(?user $user): static
+    public function setUser(?User $user): static
     {
-        $this->user = $user;
+        $this->User = $user;
 
         return $this;
     }
