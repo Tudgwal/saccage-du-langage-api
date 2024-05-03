@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  database:
+    container_name: database
+    image: mariadb:11.3
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: symfony
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: symfony
+    volumes:
+      - ./mysql:/var/lib/mysql
+  php:
+    build:
+      context: ./docker
+    ports:
+      - 8080:80
+    volumes:
+      - ./docker/default.conf:/etc/apache2/sites-enabled/000-default.conf
+      - .:/var/www
+    depends_on:
+      - database
