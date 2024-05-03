@@ -11,7 +11,7 @@ services:
       MYSQL_PASSWORD: symfony
     volumes:
       - ./mysql:/var/lib/mysql
-  php:
+  symfony:
     build:
       context: ./docker
     ports:
@@ -21,3 +21,14 @@ services:
       - .:/var/www
     depends_on:
       - database
+  phpma:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: database
+      PMA_USER: root
+      PMA_PASSWORD: secret
+      UPLOAD_LIMIT: 20M
+    ports:
+      - 8899:80

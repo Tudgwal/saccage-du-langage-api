@@ -62,3 +62,6 @@ symfony.lock
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+
+# docker
+/mysql/
