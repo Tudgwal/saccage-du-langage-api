@@ -21,3 +21,7 @@ init: up
 migrate: up
 	@echo "--> migrate database"
 	$(DOCKER_COMPOSE) run symfony php bin/console --no-interaction doctrine:migrations:migrate
+
+bash: up
+	@echo "--> enter in container"
+	$(DOCKER_COMPOSE) exec symfony /bin/bash
