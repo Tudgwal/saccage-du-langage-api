@@ -24,6 +24,9 @@ class Politician
     #[ORM\OneToMany(targetEntity: Quote::class, mappedBy: 'politician')]
     private Collection $quotes;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $picture = null;
+
     public function __construct()
     {
         $this->quotes = new ArrayCollection();
@@ -72,6 +75,18 @@ class Politician
                 $quote->setPolitician(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPicture(): ?string
+    {
+        return $this->picture;
+    }
+
+    public function setPicture(?string $picture): static
+    {
+        $this->picture = $picture;
 
         return $this;
     }
