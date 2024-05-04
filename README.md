@@ -83,6 +83,11 @@ Pour l'éteindre:
 make down
 ```
 
+Pour vous connecter en bash dans docker (utile pour faire les commandes php):
+```
+make bash
+```
+
 Pour vous connecter depuis les images docker:
 - [votre site](http://localhost:8080)
 - [PhpMyAdmin](http://localhost:8899)

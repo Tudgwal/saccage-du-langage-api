@@ -25,6 +25,9 @@ class Vote
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
+    #[ORM\Column]
+    private ?bool $upvote = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -62,6 +65,18 @@ class Vote
     public function setDate(\DateTimeInterface $date): static
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function isUpvote(): ?bool
+    {
+        return $this->upvote;
+    }
+
+    public function setUpvote(bool $upvote): static
+    {
+        $this->upvote = $upvote;
 
         return $this;
     }

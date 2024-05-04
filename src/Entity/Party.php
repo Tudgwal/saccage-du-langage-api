@@ -24,6 +24,9 @@ class Party
     #[ORM\OneToMany(targetEntity: Quote::class, mappedBy: 'party')]
     private Collection $quotes;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $logo = null;
+
     public function __construct()
     {
         $this->quotes = new ArrayCollection();
@@ -72,6 +75,18 @@ class Party
                 $quote->setParty(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getLogo(): ?string
+    {
+        return $this->logo;
+    }
+
+    public function setLogo(?string $logo): static
+    {
+        $this->logo = $logo;
 
         return $this;
     }
