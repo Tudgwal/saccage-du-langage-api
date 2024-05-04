@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 class PartyController extends AbstractController
 {
 
-    #[Route('/', methods: ['GET'])]
+    #[Route('', methods: ['GET'])]
     public function index(EntityManagerInterface $entityManager) : JsonResponse
     {
         $partys = $entityManager->getRepository(Party::class)->findAll();
@@ -31,14 +31,13 @@ class PartyController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/', methods: ['POST'])]
-    public function create(EntityManager $entityManager, Request $request) : JsonResponse
+    #[Route('', methods: ['POST'])]
+    public function create(EntityManagerInterface $entityManager, Request $request) : JsonResponse
     {
         $party = new Party();
         $party->setName($request->request->get('name'));
         $party->setLogo($request->request->get('logo'));
 
-        $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($party);
         $entityManager->flush();
 
@@ -55,7 +54,7 @@ class PartyController extends AbstractController
         $party = $entityManager->getRepository(Party::class)->find($id);
 
         if (!$party) {
-            throw $this->json('Party not found', 404);
+            return $this->json('Party not found', 404);
         }
 
         return $this->json([
@@ -71,8 +70,10 @@ class PartyController extends AbstractController
         $party = $entityManager->getRepository(Party::class)->find($id);
 
         if (!$party) {
-            throw $this->json('Party not found', 404);
+            return $this->json('Party not found', 404);
         }
+
+        var_dump($request->request->get('name'));
 
         if ($request->request->has('name')) {
             $party->setName($request->request->get('name'));
@@ -97,7 +98,7 @@ class PartyController extends AbstractController
         $party = $entityManager->getRepository(Party::class)->find($id);
 
         if (!$party) {
-            throw $this->json('Party not found', 404);
+            return $this->json('Party not found', 404);
         }
 
         $name = $party->getName();
