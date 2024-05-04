@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 #[Route('/politician', name: 'app_politician')]
 class PoliticianController extends AbstractController
 {
-    #[Route('/', methods: ['GET'])]
+    #[Route('', methods: ['GET'])]
     public function index(EntityManagerInterface $entityManager) : JsonResponse
     {
         $politicians = $entityManager->getRepository(Politician::class)->findAll();
@@ -30,14 +30,13 @@ class PoliticianController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/', methods: ['POST'])]
-    public function create(EntityManager $entityManager, Request $request) : JsonResponse
+    #[Route('', methods: ['POST'])]
+    public function create(EntityManagerInterface $entityManager, Request $request) : JsonResponse
     {
         $politician = new Politician();
         $politician->setName($request->request->get('name'));
         $politician->setPicture($request->request->get('picture'));
 
-        $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($politician);
         $entityManager->flush();
 
@@ -54,7 +53,7 @@ class PoliticianController extends AbstractController
         $politician = $entityManager->getRepository(Politician::class)->find($id);
 
         if (!$politician) {
-            throw $this->json('Politician not found', 404);
+            return $this->json('Politician not found', 404);
         }
 
         return $this->json([
@@ -70,7 +69,7 @@ class PoliticianController extends AbstractController
         $politician = $entityManager->getRepository(Politician::class)->find($id);
 
         if (!$politician) {
-            throw $this->json('Politician not found', 404);
+            return $this->json('Politician not found', 404);
         }
 
         if ($request->request->has('name')) {
@@ -96,7 +95,7 @@ class PoliticianController extends AbstractController
         $politician = $entityManager->getRepository(Politician::class)->find($id);
 
         if (!$politician) {
-            throw $this->json('Politician not found', 404);
+            return $this->json('Politician not found', 404);
         }
 
         $name = $politician->getName();
