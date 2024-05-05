@@ -30,7 +30,7 @@ class ApiAuthenticator extends AbstractAuthenticator
 
     public function authenticate(Request $request): Passport
     {
-        $identifier = str_replace('Breaer ', '', $request->headers->get('Authorization'));
+        $identifier = str_replace('Bearer ', '', $request->headers->get('Authorization'));
         return new SelfValidatingPassport(new UserBadge($identifier));
     }
 
