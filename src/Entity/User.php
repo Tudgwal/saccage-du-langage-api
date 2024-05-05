@@ -3,75 +3,92 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    #[ORM\Column(length: 180)]
+    private ?string $username = null;
+
+    /**
+     * @var list<string> The user roles
+     */
+    #[ORM\Column]
+    private array $roles = [];
+
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column]
+    private ?string $password = null;
 
     #[ORM\Column(length: 255)]
     private ?string $email = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $password = null;
-
-    /**
-     * @var Collection<int, Quote>
-     */
-    #[ORM\OneToMany(targetEntity: Quote::class, mappedBy: 'user')]
-    private Collection $quotes;
-
-    /**
-     * @var Collection<int, Vote>
-     */
-    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'user')]
-    private Collection $votes;
-
-    public function __construct()
-    {
-        $this->quotes = new ArrayCollection();
-        $this->votes = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getUsername(): ?string
     {
-        return $this->name;
+        return $this->username;
     }
 
-    public function setName(string $name): static
+    public function setUsername(string $username): static
     {
-        $this->name = $name;
+        $this->username = $username;
 
         return $this;
     }
 
-    public function getEmail(): ?string
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
     {
-        return $this->email;
+        return (string) $this->email;
     }
 
-    public function setEmail(string $email): static
+    /**
+     * @see UserInterface
+     *
+     * @return list<string>
+     */
+    public function getRoles(): array
     {
-        $this->email = $email;
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    /**
+     * @param list<string> $roles
+     */
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
 
         return $this;
     }
 
-    public function getPassword(): ?string
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -84,61 +101,22 @@ class User
     }
 
     /**
-     * @return Collection<int, Quote>
+     * @see UserInterface
      */
-    public function getQuotes(): Collection
+    public function eraseCredentials(): void
     {
-        return $this->quotes;
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 
-    public function addQuote(Quote $quote): static
+    public function getEmail(): ?string
     {
-        if (!$this->quotes->contains($quote)) {
-            $this->quotes->add($quote);
-            $quote->setUser($this);
-        }
-
-        return $this;
+        return $this->email;
     }
 
-    public function removeQuote(Quote $quote): static
+    public function setEmail(string $email): static
     {
-        if ($this->quotes->removeElement($quote)) {
-            // set the owning side to null (unless already changed)
-            if ($quote->getUser() === $this) {
-                $quote->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Vote>
-     */
-    public function getVotes(): Collection
-    {
-        return $this->votes;
-    }
-
-    public function addVote(Vote $vote): static
-    {
-        if (!$this->votes->contains($vote)) {
-            $this->votes->add($vote);
-            $vote->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeVote(Vote $vote): static
-    {
-        if ($this->votes->removeElement($vote)) {
-            // set the owning side to null (unless already changed)
-            if ($vote->getUser() === $this) {
-                $vote->setUser(null);
-            }
-        }
+        $this->email = $email;
 
         return $this;
     }

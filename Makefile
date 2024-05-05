@@ -15,8 +15,9 @@ down:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down
 
 init: up
-	@echo "--> create database"
-	$(DOCKER_COMPOSE) run symfony php bin/console doctrine:database:create
+	@echo "--> init project"
+	$(DOCKER_COMPOSE) run symfony composer install
+	$(DOCKER_COMPOSE) run symfony php bin/console lexik:jwt:generate-keypair
 
 migrate: up
 	@echo "--> migrate database"
