@@ -4,7 +4,7 @@ DOCKER_COMPOSE = docker-compose
 DOCKER_COMPOSE_FILE = docker-compose.yml
 
 # Targets
-.PHONY: up down init migrate
+.PHONY: up down init migrate bash re cache build
 
 up:
 	@echo "--> build containers"
@@ -26,3 +26,14 @@ migrate: up
 bash: up
 	@echo "--> enter in container"
 	$(DOCKER_COMPOSE) exec symfony /bin/bash
+
+re: down up
+	@echo "--> rebuild containers"
+
+cache: up
+	@echo "--> clear cache"
+	$(DOCKER_COMPOSE) run symfony php bin/console cache:clear
+
+build:
+	@echo "--> build containers"
+	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) build --no-cache

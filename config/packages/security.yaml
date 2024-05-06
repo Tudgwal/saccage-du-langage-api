@@ -9,16 +9,14 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+        # used to reload user from session & other features (e.g. switch_user)
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        api:
-            pattern: ^/
+        main:
             stateless: true
-            provider: app_user_provider
-            lazy: true
             jwt: ~
             json_login:
                 check_path: auth
@@ -26,10 +24,6 @@ security:
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
-            custom_authenticators:
-                - App\Security\ApiAuthenticator
-
-        main:
             lazy: true
             provider: app_user_provider
         
@@ -42,8 +36,11 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - {path: /user/create, roles: IS_AUTHENTICATED_ANONYMOUSLY} # Allow anonymous users to create a user
+        - {path: /user/delete, roles: ROLE_USER}
+        - {path: /user/me, roles: ROLE_USER}
+        - {path: /user/edit, roles: ROLE_USER}
+        - {path: ^/user, roles: ROLE_ADMIN}
 
 when@test:
     security:
