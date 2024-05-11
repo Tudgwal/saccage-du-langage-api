@@ -38,6 +38,7 @@ class UserController extends AbstractController
     public function show(EntityManagerInterface $entityManager, Request $request) : JsonResponse
     {
         $user = $entityManager->getRepository(User::class)->find($this->getUser()->getId());
+        dump($user); exit;
         return $this->json([
             'id' => $user->getId(),
             'name' => $user->getUsername()
@@ -105,12 +106,31 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', methods: ['DELETE'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function delete(EntityManagerInterface $entityManager, int $id) : JsonResponse
+    #[Route('/delete', methods: ['POST'])]
+    public function delete(EntityManagerInterface $entityManager, Request $request, int $id) : JsonResponse
     {
+        $id = $request->request->get('user');
+
+        if (!$id || empty($id))
+            return $this->json('You need to provide a user', 404);
+
         $user = $entityManager->getRepository(User::class)->find($id);
 
+        if (!$user) {
+            return $this->json('User not found', 404);
+        }
+
+        $entityManager->remove($user);
+        $entityManager->flush();
+
+        return $this->json('User deleted');
+    }
+
+    #[Route('/deleteme', methods: ['DELETE'])]
+    public function deleteme(EntityManagerInterface $entityManager) : JsonResponse
+    {
+        $user = $entityManager->getRepository(User::class)->find($this->getUser()->getId());
+        
         if (!$user) {
             return $this->json('User not found', 404);
         }
@@ -160,20 +180,5 @@ class UserController extends AbstractController
             'email' => $user->getEmail(),
             'roles' => $user->getRoles()
         ]);
-    }
-
-    #[Route('/delete', methods: ['GET'])]
-    public function deleteMe(EntityManagerInterface $entityManager) : JsonResponse
-    {
-        $user = $entityManager->getRepository(User::class)->find($this->getUser()->getId());
-
-        if (!$user) {
-            return $this->json('User not found', 404);
-        }
-
-        $entityManager->remove($user);
-        $entityManager->flush();
-
-        return $this->json('User deleted');
     }
 }

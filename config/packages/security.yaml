@@ -36,8 +36,12 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - {path: ^/vote, roles: ROLE_USER}
+        - {path: /quote/delete, roles: ROLE_USER}
+        - {path: /quote/create, roles: ROLE_USER}
         - {path: /user/create, roles: IS_AUTHENTICATED_ANONYMOUSLY} # Allow anonymous users to create a user
-        - {path: /user/delete, roles: ROLE_USER}
+        - {path: /user/deleteme, roles: ROLE_USER}
+        - {path: /user/delete, roles: ROLE_ADMIN}
         - {path: /user/me, roles: ROLE_USER}
         - {path: /user/edit, roles: ROLE_USER}
         - {path: ^/user, roles: ROLE_ADMIN}
