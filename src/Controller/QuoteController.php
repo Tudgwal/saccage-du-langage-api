@@ -121,7 +121,14 @@ class QuoteController extends AbstractController
     #[Route('/delete', methods: ['POST'])]
     public function delete(EntityManagerInterface $entityManager, Request $request) : JsonResponse
     {
+        if (!$request->request->get('quote') || empty($request->request->get('quote')) )
+            return $this->json('A quote is needed', 404);
+
         $quote = $entityManager->getRepository(Quote::class)->find($request->request->get('quote'));
+
+        if (!$quote) {
+            return $this->json('Quote not found', 404);
+        }
 
         $user = $this->getUser();
 
@@ -135,5 +142,27 @@ class QuoteController extends AbstractController
         $entityManager->flush();
 
         return $this->json('Quote deleted');
+    }
+
+    #[Route('/top', methods: ['GET'])]
+    public function top(EntityManagerInterface $entityManager) : JsonResponse
+    {
+        $quotes = $entityManager->getRepository(Quote::class)->findAll();
+
+        $data = [];
+        foreach ($quotes as $quote){
+            $data[] = [
+                'id' => $quote->getId(),
+                'quote' => $quote->getQuote(),
+                'link' => $quote->getLink(),
+                'private' => $quote->isPrivateLink(),
+                'date' => $quote->getDate(),
+                'politician' => $quote->getPolitician(),
+                'party' => $quote->getParty(),
+                'user' => $quote->getUser()
+            ];
+        }
+
+        return $this->json($data);
     }
 }

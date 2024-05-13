@@ -36,14 +36,21 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - {path: /party/delete, roles: ROLE_ADMIN}
+        - {path: /party/edit, roles: ROLE_USER}
+        - {path: /party/create, roles: ROLE_USER}
+        - {path: /politician/delete, roles: ROLE_ADMIN}
+        - {path: /politician/edit, roles: ROLE_USER}
+        - {path: /politician/create, roles: ROLE_USER}
         - {path: ^/vote, roles: ROLE_USER}
         - {path: /quote/delete, roles: ROLE_USER}
         - {path: /quote/create, roles: ROLE_USER}
         - {path: /user/create, roles: IS_AUTHENTICATED_ANONYMOUSLY} # Allow anonymous users to create a user
-        - {path: /user/deleteme, roles: ROLE_USER}
         - {path: /user/delete, roles: ROLE_ADMIN}
         - {path: /user/me, roles: ROLE_USER}
         - {path: /user/edit, roles: ROLE_USER}
+        - {path: /user/purgeVotes, roles: ROLE_ADMIN}
+        - {path: /user/purgeQuotes, roles: ROLE_ADMIN}
         - {path: ^/user, roles: ROLE_ADMIN}
 
 when@test:

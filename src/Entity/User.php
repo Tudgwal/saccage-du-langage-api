@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -33,6 +35,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $username = null;
+
+    /**
+     * @var Collection<int, Quote>
+     */
+    #[ORM\OneToMany(targetEntity: Quote::class, mappedBy: 'user')]
+    private Collection $quotes;
+
+    /**
+     * @var Collection<int, Vote>
+     */
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'user')]
+    private Collection $votes;
+
+
+    /**
+     * @var Collection<int, Party>
+     */
+    #[ORM\OneToMany(targetEntity: Party::class, mappedBy: 'user')]
+    private Collection $parties;
+
+    /**
+     * @var Collection<int, Politician>
+     */
+    #[ORM\OneToMany(targetEntity: Politician::class, mappedBy: 'user')]
+    private Collection $politicians;
+
+    public function __construct()
+    {
+        $this->parties = new ArrayCollection();
+        $this->politicians = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -118,6 +151,95 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->username = $username;
 
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Party>
+     */
+    public function getParties(): Collection
+    {
+        return $this->parties;
+    }
+
+    public function addParty(Party $party): static
+    {
+        if (!$this->parties->contains($party)) {
+            $this->parties->add($party);
+        }
+
+        return $this;
+    }
+
+    public function removeParty(Party $party): static
+    {
+        $this->parties->removeElement($party);
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Politician>
+     */
+    public function getPoliticians(): Collection
+    {
+        return $this->politicians;
+    }
+
+    public function addPolitician(Politician $politician): static
+    {
+        if (!$this->politicians->contains($politician)) {
+            $this->politicians->add($politician);
+        }
+
+        return $this;
+    }
+
+    public function removePolitician(Politician $politician): static
+    {
+        $this->politicians->removeElement($politician);
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Quote>
+     */
+    public function getQuotes(): Collection
+    {
+        return $this->quotes;
+    }
+
+    public function addQuote(Quote $quote): static
+    {
+        if (!$this->quotes->contains($quote)) {
+            $this->quotes->add($quote);        }
+
+        return $this;
+    }
+
+    public function removeQuote(Quote $quote): static
+    {
+        $this->quotes->removeElement($quote);
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Vote>
+     */
+    public function getVotes(): Collection
+    {
+        return $this->votes;
+    }
+
+    public function addVote(): static
+    {
+        $this->votes->add($vote);
+
+        return $this;
+    }
+
+    public function removeVote(Vote $vote): static
+    {
+        $this->votes->removeElement($vote);
         return $this;
     }
 }

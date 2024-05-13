@@ -12,6 +12,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use App\Service\UserObjectsService;
 
 #[Route('/user', name: 'app_user')]
 class UserController extends AbstractController
@@ -107,7 +108,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/delete', methods: ['POST'])]
-    public function delete(EntityManagerInterface $entityManager, Request $request, int $id) : JsonResponse
+    public function delete(EntityManagerInterface $entityManager, Request $request, UserObjectsService $userObjectsService, int $id) : JsonResponse
     {
         $id = $request->request->get('user');
 
@@ -120,20 +121,9 @@ class UserController extends AbstractController
             return $this->json('User not found', 404);
         }
 
-        $entityManager->remove($user);
-        $entityManager->flush();
+        $admin = $entityManager->getRepository(User::class)->find($this->getUser()->getId());
 
-        return $this->json('User deleted');
-    }
-
-    #[Route('/deleteme', methods: ['DELETE'])]
-    public function deleteme(EntityManagerInterface $entityManager) : JsonResponse
-    {
-        $user = $entityManager->getRepository(User::class)->find($this->getUser()->getId());
-        
-        if (!$user) {
-            return $this->json('User not found', 404);
-        }
+        $userObjectsService->reownUserObjects($user, $admin);
 
         $entityManager->remove($user);
         $entityManager->flush();
@@ -180,5 +170,78 @@ class UserController extends AbstractController
             'email' => $user->getEmail(),
             'roles' => $user->getRoles()
         ]);
+    }
+
+    #[Route('/purgeVotes', methods: ['POST'])]
+    public function purgeVotes(EntityManagerInterface $entityManager, Request $request, UserObjectsService $userObjectsService) : JsonResponse
+    {
+        $user = $entityManager->getRepository(User::class)->find($request->request->get('user'));
+
+        if (!$user) {
+            return $this->json('User not found', 404);
+        }
+
+        $userObjectsService->purgeVotesByUser($user);
+        
+        return $this->json('Votes purged');
+    }
+
+    #[Route('/purgeQuotes', methods: ['POST'])]
+    public function purgeQuote(EntityManagerInterface $entityManager, Request $request, UserObjectsService $userObjectsService) : JsonResponse
+    {
+        $user = $entityManager->getRepository(User::class)->find($request->request->get('user'));
+
+        if (!$user) {
+            return $this->json('User not found', 404);
+        }
+
+        $userObjectsService->purgeQuotesByUser($user);
+        
+        return $this->json('Quotes purged');
+    }
+
+    #[Route('/purgeParties', methods: ['POST'])]
+    public function purgeParties(EntityManagerInterface $entityManager, Request $request, UserObjectsService $userObjectsService) : JsonResponse
+    {
+        $user = $entityManager->getRepository(User::class)->find($request->request->get('user'));
+
+        if (!$user) {
+            return $this->json('User not found', 404);
+        }
+
+        $userObjectsService->purgePartiesByUser($user);
+
+        return $this->json('Parties purged');
+    }
+
+    #[Route('/purgePoliticians', methods: ['POST'])]
+    public function purgePoliticians(EntityManagerInterface $entityManager, Request $request, UserObjectsService $userObjectsService) : JsonResponse
+    {
+        $user = $entityManager->getRepository(User::class)->find($request->request->get('user'));
+
+        if (!$user) {
+            return $this->json('User not found', 404);
+        }
+
+        $userObjectsService->purgePoliticiansByUser($user);
+        
+        return $this->json('Politicians purged');
+    }
+
+    #[Route('/purgeAll', methods: ['POST'])]
+    public function purgeAll(EntityManagerInterface $entityManager, Request $request, UserObjectsService $userObjectsService) : JsonResponse
+    {
+        $user = $entityManager->getRepository(User::class)->find($request->request->get('user'));
+
+        if (!$user) {
+            return $this->json('User not found', 404);
+        }
+
+        $userObjectsService->purgeVotesByUser($user);
+        $userObjectsService->purgeQuotesByUser($user);
+        $userObjectsService->purgePartiesByUser($user);
+        $userObjectsService->purgePoliticiansByUser($user);
+        
+        return $this->json('All purged');
     }
 }
