@@ -24,21 +24,26 @@ class PartyController extends AbstractController
             $data[] = [
                 'id' => $party->getId(),
                 'name' => $party->getName(),
-                'logo' => $party->getLogo()
+                'logo' => $party->getLogo(),
+                'user' => $party->getUser()->getId()
             ];
         }
 
         return $this->json($data);
     }
 
-    #[Route('', methods: ['POST'])]
+    #[Route('/create', methods: ['POST'])]
     public function create(EntityManagerInterface $entityManager, Request $request) : JsonResponse
     {
+        $user = $entityManager->getRepository(User::class)->find($this->getUser()->getId());
+
         $party = new Party();
         $party->setName($request->request->get('name'));
         $party->setLogo($request->request->get('logo'));
+        $party->setUser($user);
 
         $entityManager->persist($party);
+        $user->addParty($party);
         $entityManager->flush();
 
         return $this->json([
@@ -60,20 +65,27 @@ class PartyController extends AbstractController
         return $this->json([
             'id' => $party->getId(),
             'name' => $party->getName(),
-            'logo' => $party->getLogo()
+            'logo' => $party->getLogo(),
+            'user' => $party->getUser()->getId()
         ]);
     }
 
-    #[Route('/{id}', methods: ['PUT', 'PATCH'])]
+    #[Route('/edit', methods: ['POST'])]
     public function update(EntityManagerInterface $entityManager, Request $request, int $id) : JsonResponse
     {
-        $party = $entityManager->getRepository(Party::class)->find($id);
+
+        $user = $entityManager->getRepository(User::class)->find($this->getUser()->getId());
+
+        if (!in_array('ROLE_ADMIN', $user->getRoles()) || 
+            $user->getId() != $party->getUser()->getId()){
+            return $this->json('You can not edit this party', HHTP::UNAUTHORIZE);
+        }
+
+        $party = $entityManager->getRepository(Party::class)->find($request->request->get('party'));
 
         if (!$party) {
             return $this->json('Party not found', 404);
         }
-
-        var_dump($request->request->get('name'));
 
         if ($request->request->has('name')) {
             $party->setName($request->request->get('name'));
@@ -92,16 +104,22 @@ class PartyController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', methods: ['DELETE'])]
-    public function delete(EntityManagerInterface $entityManager, int $id) : JsonResponse
+    #[Route('/delete', methods: ['POST'])]
+    public function delete(EntityManagerInterface $entityManager, Request $request) : JsonResponse
     {
-        $party = $entityManager->getRepository(Party::class)->find($id);
+        if (!$request->request->get('party') || empty($request->request->get('party')) )
+            return $this->json('A party is needed', 404);
+
+        $party = $entityManager->getRepository(Party::class)->find($request->request->get('party'));
 
         if (!$party) {
             return $this->json('Party not found', 404);
         }
 
         $name = $party->getName();
+
+        $user = $party->getUser();
+        $user->removeParty($party);
 
         $entityManager->remove($party);
         $entityManager->flush();

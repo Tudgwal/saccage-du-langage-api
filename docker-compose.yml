@@ -11,6 +11,7 @@ services:
       MYSQL_PASSWORD: symfony
     volumes:
       - ./mysql:/var/lib/mysql
+
   symfony:
     build:
       context: ./docker

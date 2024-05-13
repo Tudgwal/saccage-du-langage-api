@@ -23,21 +23,27 @@ class PoliticianController extends AbstractController
             $data[] = [
                 'id' => $politician->getId(),
                 'name' => $politician->getName(),
-                'picture' => $politician->getPicture()
+                'picture' => $politician->getPicture(),
+                'user' => $politician->getUser()->getId()
             ];
         }
 
         return $this->json($data);
     }
 
-    #[Route('', methods: ['POST'])]
+    #[Route('/create', methods: ['POST'])]
     public function create(EntityManagerInterface $entityManager, Request $request) : JsonResponse
     {
+        $user = $entityManager->getRepository(User::class)->find($this->getUser()->getId());
+
         $politician = new Politician();
         $politician->setName($request->request->get('name'));
         $politician->setPicture($request->request->get('picture'));
+        $politician->setUser($user);
+
 
         $entityManager->persist($politician);
+        $user->addPolitician($politician);
         $entityManager->flush();
 
         return $this->json([
@@ -63,10 +69,17 @@ class PoliticianController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', methods: ['PUT', 'PATCH'])]
-    public function update(EntityManagerInterface $entityManager, Request $request, int $id) : JsonResponse
+    #[Route('/edit', methods: ['PUT', 'PATCH'])]
+    public function update(EntityManagerInterface $entityManager, Request $request) : JsonResponse
     {
-        $politician = $entityManager->getRepository(Politician::class)->find($id);
+        $user = $entityManager->getRepository(User::class)->find($this->getUser()->getId());
+
+        if (!in_array('ROLE_ADMIN', $user->getRoles()) || 
+            $user->getId() != $politician->getUser()->getId()){
+            return $this->json('You can not edit this politician', HHTP::UNAUTHORIZE);
+        }
+
+        $politician = $entityManager->getRepository(Politician::class)->find($request->request->get('politician'));
 
         if (!$politician) {
             return $this->json('Politician not found', 404);
@@ -89,16 +102,23 @@ class PoliticianController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', methods: ['DELETE'])]
-    public function delete(EntityManagerInterface $entityManager, int $id) : JsonResponse
+    #[Route('/delete', methods: ['POST'])]
+    public function delete(EntityManagerInterface $entityManager) : JsonResponse
     {
-        $politician = $entityManager->getRepository(Politician::class)->find($id);
+        if (!$request->request->get('politician') || empty($request->request->get('politician')) )
+            return $this->json('A politician is needed', 404);
+
+
+        $politician = $entityManager->getRepository(Politician::class)->find($request->request->get('politician'));
 
         if (!$politician) {
             return $this->json('Politician not found', 404);
         }
 
         $name = $politician->getName();
+
+        $user = $politician->getUser();
+        $user->removePolitician($politician);
 
         $entityManager->remove($politician);
         $entityManager->flush();
