@@ -17,7 +17,6 @@ class PartyController extends AbstractController
     public function index(EntityManagerInterface $entityManager) : JsonResponse
     {
         $partys = $entityManager->getRepository(Party::class)->findAll();
-
         $data = [];
 
         foreach ($partys as $party) {
