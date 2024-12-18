@@ -88,6 +88,16 @@ Pour vous connecter en bash dans docker (utile pour faire les commandes php):
 make bash
 ```
 
+## Administration
+
+Pour passer administrateur sur le site, il faut modifier la base de donnée.
+Au plus simple, créez vous un compte de manière classique, puis allez dans le terminal et tapez:
+```bash
+php bin/console promote-to-admin <votre email>
+```
+
+ou allez dans la base de donnée et modifiez le champ `roles` de la table `user` pour ajouter `["ROLE_ADMIN"]`
+
 Pour vous connecter depuis les images docker:
 - [votre site](http://localhost:8080)
 - [PhpMyAdmin](http://localhost:8899)

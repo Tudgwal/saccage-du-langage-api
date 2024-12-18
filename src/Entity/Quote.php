@@ -46,6 +46,9 @@ class Quote
     #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'quote')]
     private Collection $votes;
 
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTimeInterface $timestamp = null;
+
     public function __construct()
     {
         $this->votes = new ArrayCollection();
@@ -166,6 +169,18 @@ class Quote
                 $vote->setQuote(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTimestamp(): ?\DateTimeInterface
+    {
+        return $this->timestamp;
+    }
+
+    public function setTimestamp(\DateTimeInterface $timestamp): static
+    {
+        $this->timestamp = $timestamp;
 
         return $this;
     }
